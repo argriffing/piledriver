@@ -1,0 +1,4 @@
+Convert a pileup file to a binary format,
+where each record in the binary file corresponds to an HMM observation.
+
+
