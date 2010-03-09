@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
   FILE *fout = fopen(argv[1], "wb");
   if (!fout)
   {
-    fprintf(stderr, "Failed to open %s for writing.", argv[0]);
+    fprintf(stderr, "Failed to open %s for writing.\n", argv[1]);
     return EXIT_FAILURE;
   }
   /* open the input files for reading the binary data */
