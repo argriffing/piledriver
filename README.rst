@@ -31,3 +31,7 @@ pilesplitter
 
 Split a multiple-chromosome pileup file into multiple single-chromosome
 pileup files.
+
+The input is through stdin,
+and the two command line arguments define the prefix and suffix
+of the created files.
