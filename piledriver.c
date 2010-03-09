@@ -4,11 +4,11 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "piledriver.h"
-
 #define ACGTN 5
 
 const size_t MAXLINE = 8192;
+
+typedef int32_t ntcount_t;
 
 /*
 This is an example of a 10-column pileup file.
@@ -71,18 +71,15 @@ int parse_tab_separation(char *s, char *s_words[])
 int write_default_data(FILE *fout)
 {
   int errcode = 0;
-  char c = 'N';
-  uint16_t data[ACGTN] = {0,0,0,0,0};
-  fwrite(&c, sizeof(c), 1, fout);
+  ntcount_t data[ACGTN] = {0,0,0,0,0};
   fwrite(data, sizeof(data), 1, fout);
   return errcode;
 }
 
-int write_informative_data(char ref_nt, uint16_t acgtn_counts[], FILE *fout)
+int write_informative_data(ntcount_t acgtn_counts[], FILE *fout)
 {
   int errcode = 0;
-  fwrite (&ref_nt, sizeof(ref_nt), 1, fout);
-  fwrite(acgtn_counts, sizeof(uint16_t), ACGTN, fout);
+  fwrite(acgtn_counts, sizeof(ntcount_t), ACGTN, fout);
   return errcode;
 }
 
@@ -111,7 +108,7 @@ int nt_to_index(char nt)
  * @param pile: the bases within reads aligned to the position
  * @param acgtn_counts: counts are accumulated here
  */
-int parse_acgtn(char ref_nt, const char *pile, uint16_t acgtn_counts[])
+int parse_acgtn(char ref_nt, const char *pile, ntcount_t acgtn_counts[])
 {
   int ref_index = nt_to_index(ref_nt);
   if (ref_index < 0) return -1;
@@ -157,7 +154,7 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
   int current_index;
   char *s_words[10];
   char ref_nt;
-  uint16_t acgtn_counts[ACGTN];
+  ntcount_t acgtn_counts[ACGTN];
   while (fgets(s, MAXLINE, fin) != NULL)
   {
     size_t line_length = strlen(s);
@@ -204,7 +201,7 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
       errcode = -1; break;
     }
     /* write data for the current position */
-    write_informative_data(ref_nt, acgtn_counts, fout);
+    write_informative_data(acgtn_counts, fout);
     last_index = current_index;
   }
   /* write default data for the remaining positions */

@@ -12,14 +12,9 @@ piledriver
 
 Lossily convert a 10-column single-chromosome pileup file to a binary format.
 
-The output binary file has one record
-for each reference nucleotide position in the chromosome.
-Each record is 11 bytes.
-The first byte is the reference nucleotide
-character taken from the pileup file.
-It is one of {A, C, G, T, N}.
-The remaining bytes define the uint16_t counts of each of these five
-nucleotide symbols in the aligned read column.
+The output binary file has 32-bit integer counts
+for aligned (A, C, G, T, N) nucleotide symbols
+at each position in the reference sequence.
 
 Input and output are through stdin and stdout.
 The single command line argument
@@ -29,9 +24,13 @@ that is, the length of the reference sequence.
 pilesplitter
 ------------
 
-Split a multiple-chromosome pileup file into multiple single-chromosome
-pileup files.
+Split a multiple-chromosome pileup file into multiple
+single-chromosome pileup files.
 
 The input is through stdin,
 and the two command line arguments define the prefix and suffix
 of the created files.
+
+As the input is read, each line is appended to the appropriate output file.
+Therefore you might want to make sure that none of the output files
+already exists before using this script.
