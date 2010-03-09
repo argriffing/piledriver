@@ -42,3 +42,16 @@ Add binary files together elementwise.
 Elements are assumed to be 32 bit integers.
 The first argument to this script is the output file.
 The remaining arguments are the input files to be summed elementwise.
+
+acgtn-to-rabc
+-------------
+
+Use a reference sequence to convert a binary file of (A, C, G, T, N)
+counts to a file of (R, A, B, C) counts.
+ACGTN refers to the four nucleotides plus an ambiguous nucleotide.
+RABC refers to a reference nucletide plus three non-reference nucleotides.
+
+The first argument of this script is the binary file
+of int32 ACGTN counts per position.
+The second argument is a file containing only reference nucleotides.
+The final argument is the output filename for the int32 RABC counts.
