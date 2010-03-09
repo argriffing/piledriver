@@ -34,3 +34,11 @@ of the created files.
 As the input is read, each line is appended to the appropriate output file.
 Therefore you might want to make sure that none of the output files
 already exists before using this script.
+
+elementwise-sum
+---------------
+
+Add binary files together elementwise.
+Elements are assumed to be 32 bit integers.
+The first argument to this script is the output file.
+The remaining arguments are the input files to be summed elementwise.
