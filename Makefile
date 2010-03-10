@@ -1,8 +1,8 @@
 .PHONY: all
 all : piledriver pilesplitter elementwise-sum acgtn-to-rabc
 
-piledriver : piledriver.o
-	gcc piledriver.o -o piledriver
+piledriver : piledriver.o xgutil.o
+	gcc piledriver.o xgutil.o -o piledriver
 piledriver.o : piledriver.c
 	gcc -c piledriver.c
 

@@ -4,9 +4,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#define ACGTN 5
+#include "xgutil.h"
 
-const size_t MAXLINE = 8192;
+#define ACGTN 5
 
 typedef int32_t ntcount_t;
 
@@ -58,7 +58,7 @@ int parse_tab_separation(char *s, char *s_words[])
   }
   if (word_index != 10)
   {
-    fprintf(stderr, "expected 9 tabs per line\n");
+    fprintf(stderr, "expected 10 columns per line but found %d\n", word_index);
     return -1;
   }
   return 0;
@@ -149,25 +149,24 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
 {
   int pos=0;
   int errcode = 0;
-  char *s = malloc(MAXLINE);
+  size_t linesize = 8;
+  char *line = malloc(linesize);
+  char *next_line;
   int i;
   int last_index = -1;
   int current_index;
   char *s_words[10];
   char ref_nt;
   ntcount_t acgtn_counts[ACGTN];
-  while (fgets(s, MAXLINE, fin) != NULL)
+  while ((next_line = fautogets(line, &linesize, fin)) != NULL)
   {
-    size_t line_length = strlen(s);
-    if (line_length == MAXLINE-1)
-    {
-      fprintf(stderr, "a line was too long\n");
-      errcode = -1; break;
-    }
+    line = next_line;
+    size_t line_length = strlen(line);
     /* parse the tab separated words */
-    if (parse_tab_separation(s, s_words) < 0)
+    if (parse_tab_separation(line, s_words) < 0)
     {
-      fprintf(stderr, "this error was on error on line %d\n", pos+1);
+      fprintf(stderr, "this error was on line %d\n", pos+1);
+      fprintf(stderr, "second word: %s\n", s_words[1]);
       errcode = -1; break;
     }
     /* read the reference sequence position */
@@ -189,7 +188,7 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
         fprintf(stderr, "out of bounds positions should have ref nt N\n");
         errcode = -1; break;
       }
-      pos += 1;
+      pos++;
       continue;
     }
     /* write default data for reference positions with no aligned reads */
@@ -214,7 +213,7 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
     write_default_data(fout);
   }
   /* clean up */
-  free(s);
+  free(line);
   return errcode;
 }
 
