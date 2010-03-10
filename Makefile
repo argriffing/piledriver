@@ -1,5 +1,5 @@
 .PHONY: all
-all : piledriver pilesplitter elementwise-sum acgtn-to-rabc
+all : piledriver pilesplitter elementwise-sum acgtn-to-rabc summarize-acgtn
 
 piledriver : piledriver.o xgutil.o
 	gcc piledriver.o xgutil.o -o piledriver
@@ -21,6 +21,11 @@ acgtn-to-rabc : acgtn-to-rabc.o
 acgtn-to-rabc.o : acgtn-to-rabc.c
 	gcc -c acgtn-to-rabc.c
 
+summarize-acgtn : summarize-acgtn.o xgutil.o
+	gcc summarize-acgtn.o xgutil.o -o summarize-acgtn
+summarize-acgtn.o : summarize-acgtn.c
+	gcc -c summarize-acgtn.c
+
 xgutil : xgutil.o
 	gcc xgutil.o -o xgutil
 xgutil.o : xgutil.c
@@ -31,4 +36,5 @@ clean :
 	rm pilesplitter.o
 	rm elementwise-sum.o
 	rm acgtn-to-rabc.o
+	rm summarize-acgtn.o
 	rm xgutil.o
