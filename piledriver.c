@@ -147,6 +147,7 @@ int parse_acgtn(char ref_nt, const char *pile, ntcount_t acgtn_counts[])
 
 int process(size_t ref_seq_length, FILE *fin, FILE *fout)
 {
+  int pos=0;
   int errcode = 0;
   char *s = malloc(MAXLINE);
   int i;
@@ -166,6 +167,7 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
     /* parse the tab separated words */
     if (parse_tab_separation(s, s_words) < 0)
     {
+      fprintf(stderr, "this error was on error on line %d\n", pos+1);
       errcode = -1; break;
     }
     /* read the reference sequence position */
@@ -187,6 +189,7 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
         fprintf(stderr, "out of bounds positions should have ref nt N\n");
         errcode = -1; break;
       }
+      pos += 1;
       continue;
     }
     /* write default data for reference positions with no aligned reads */
@@ -203,6 +206,7 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
     /* write data for the current position */
     write_informative_data(acgtn_counts, fout);
     last_index = current_index;
+    pos++;
   }
   /* write default data for the remaining positions */
   for (i=last_index+1; i<ref_seq_length; i++)
