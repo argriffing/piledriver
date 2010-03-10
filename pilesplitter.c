@@ -3,7 +3,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAXLINE 8192
+#include "xgutil.h"
+
+#define MAXFILENAME 8192
 
 /*
  * Split the file into multiple parts depending on the first
@@ -12,30 +14,27 @@
 int process(FILE *fin, const char *prefix, const char *suffix)
 {
   int errcode = 0;
-  char *curr_filename = malloc(MAXLINE);
-  char *prev_filename = malloc(MAXLINE);
+  char *curr_filename = malloc(MAXFILENAME);
+  char *prev_filename = malloc(MAXFILENAME);
+  size_t linesize = 8;
+  char *line = malloc(linesize);
+  char *nextline;
   curr_filename[0] = 0;
   prev_filename[0] = 0;
   int prefix_length = strlen(prefix);
   int suffix_length = strlen(suffix);
-  char line[MAXLINE];
   FILE *fappend = NULL;
-  while (fgets(line, MAXLINE, fin) != NULL)
+  while ((nextline = fautogets(line, &linesize, fin)) != NULL)
   {
-    /* assert that the buffer is long enough to hold the line */
+    line = nextline;
     size_t line_length = strlen(line);
-    if (line_length >= MAXLINE-1)
-    {
-      fprintf(stderr, "a line was too long\n");
-      errcode = -1; break;
-    }
     /* get the length of the first word */
     int i;
     for (i=0; line[i] && !isspace(line[i]); i++);
     int word_length = i;
     /* assert that the buffer is long enough to hold the filename */
     int filename_length = prefix_length + word_length + suffix_length;
-    if (filename_length >= MAXLINE-1)
+    if (filename_length >= MAXFILENAME-1)
     {
       fprintf(stderr, "a filename was too long\n");
       errcode = -1; break;
@@ -60,6 +59,7 @@ int process(FILE *fin, const char *prefix, const char *suffix)
   }
   free(curr_filename);
   free(prev_filename);
+  free(line);
   return errcode;
 }
 

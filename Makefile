@@ -6,8 +6,8 @@ piledriver : piledriver.o
 piledriver.o : piledriver.c
 	gcc -c piledriver.c
 
-pilesplitter : pilesplitter.o
-	gcc pilesplitter.o -o pilesplitter
+pilesplitter : pilesplitter.o xgutil.o
+	gcc pilesplitter.o xgutil.o -o pilesplitter
 pilesplitter.o : pilesplitter.c
 	gcc -c pilesplitter.c
 
@@ -21,8 +21,14 @@ acgtn-to-rabc : acgtn-to-rabc.o
 acgtn-to-rabc.o : acgtn-to-rabc.c
 	gcc -c acgtn-to-rabc.c
 
+xgutil : xgutil.o
+	gcc xgutil.o -o xgutil
+xgutil.o : xgutil.c
+	gcc -c xgutil.c
+
 clean :
 	rm piledriver.o
 	rm pilesplitter.o
 	rm elementwise-sum.o
 	rm acgtn-to-rabc.o
+	rm xgutil.o
