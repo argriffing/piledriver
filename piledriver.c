@@ -38,31 +38,32 @@ Column Definition
 10 Quality values
 */
 
-int parse_tab_separation(char *s, char *s_words[])
+/*
+ * This is a strtok-like function which
+ * modifies its input buffer by changing '\t' to 0.
+ * Return the number of words actually found.
+ */
+int parse_tab_separation(char *s, char *s_words[], int maxwords)
 {
+  /* if the buffer is empty then there are no words */
+  if (!*s) return 0;
+  /* otherwise there are some words */
   int word_index = 0;
   s_words[word_index++] = s;
-  size_t i=0;
-  char *p = s;
+  char *p;
   for (p=s; *p; p++)
   {
     if (*p == '\t')
     {
-      if (word_index >= COLUMNS)
-      {
-        fprintf(stderr, "expected only 9 tabs per line\n");
-        return -1;
-      }
+      /* terminate the previous word */
       *p = 0;
+      /* if the prev word was the final requested word then we've finished */
+      if (word_index == maxwords) break;
+      /* otherwise move towards the next tab or buffer termination */
       s_words[word_index++] = p+1;
     }
   }
-  if (word_index != 10)
-  {
-    fprintf(stderr, "expected 9 tabs per line but found %d\n", word_index-1);
-    return -1;
-  }
-  return 0;
+  return word_index;
 }
 
 /*
@@ -135,6 +136,9 @@ int parse_acgtn(char ref_nt, const char *pile, ntcount_t acgtn_counts[])
     } else if (*p == '$') {
       /* end an aligned read */
       p++;
+    } else if (*p == '*') {
+      /* this might be some kind of indel related thing */
+      p++;
     } else {
       /* this should be a non-reference nucleotide */
       nt_index = nt_to_index(*p);
@@ -148,7 +152,7 @@ int parse_acgtn(char ref_nt, const char *pile, ntcount_t acgtn_counts[])
 
 int process(size_t ref_seq_length, FILE *fin, FILE *fout)
 {
-  int pos=0;
+  int pos;
   int errcode = 0;
   size_t linesize = 8;
   char *line = malloc(linesize);
@@ -159,25 +163,50 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
   char *s_words[10];
   char ref_nt;
   ntcount_t acgtn_counts[ACGTN];
-  while ((next_line = fautogets(line, &linesize, fin)) != NULL)
+  for (pos=0;
+      (next_line = fautogets(line, &linesize, fin)) != NULL;
+      pos++)
   {
     line = next_line;
     size_t line_length = strlen(line);
     /* parse the tab separated words */
-    if (parse_tab_separation(line, s_words) < 0)
+    int nwords = parse_tab_separation(line, s_words, COLUMNS+1);
+    /* complain if too few words were found */
+    if (nwords < COLUMNS)
     {
-      fprintf(stderr, "this error was on line %d\n", pos+1);
-      errcode = -1; break;
+      fprintf(stderr, "expected %d tabs per line ", COLUMNS-1);
+      fprintf(stderr, "but found %d\n", nwords-1);
+      errcode = -1; goto end;
+    }
+    /* read the reference nucleotide */
+    ref_nt = s_words[2][0];
+    /* ignore this pileup line if the reference base is an asterisk */
+    if (ref_nt == '*')
+    {
+      /*
+       * At this position there is an insertion into aligned reads
+       * with respect to the reference sequence.
+       * This causes trouble in a few ways.
+       * First, it causes the position sequence to be non-strictly-monotonic.
+       * Second, these rows sometimes have more than
+       * the nominal number of columns.
+       * Therefore we skip such a line in the pileup file.
+       */
+      continue;
+    }
+    /* complain if too many words were found */
+    if (nwords > COLUMNS)
+    {
+      fprintf(stderr, "found more than %d tabs per line\n", COLUMNS-1);
+      errcode = -1; goto end;
     }
     /* read the reference sequence position */
     current_index = atoi(s_words[1]) - 1;
     if (current_index <= last_index)
     {
-      fprintf(stderr, "reference positions should monotonically increase\n");
-      errcode = -1; break;
+      fprintf(stderr, "ref positions must strictly monotonically increase\n");
+      errcode = -1; goto end;
     }
-    /* read the reference nucleotide */
-    ref_nt = s_words[2][0];
     /* If the position goes beyond the reference sequence length,
      * then make sure that the reference base is N and do not write.
      */
@@ -186,9 +215,8 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
       if (ref_nt != 'N')
       {
         fprintf(stderr, "out of bounds positions should have ref nt N\n");
-        errcode = -1; break;
+        errcode = -1; goto end;
       }
-      pos++;
       continue;
     }
     /* write default data for reference positions with no aligned reads */
@@ -200,19 +228,23 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
     for (i=0; i<ACGTN; i++) acgtn_counts[i] = 0;
     if (parse_acgtn(ref_nt, s_words[8], acgtn_counts) < 0)
     {
-      errcode = -1; break;
+      errcode = -1; goto end;
     }
     /* write data for the current position */
     write_informative_data(acgtn_counts, fout);
     last_index = current_index;
-    pos++;
   }
   /* write default data for the remaining positions */
   for (i=last_index+1; i<ref_seq_length; i++)
   {
     write_default_data(fout);
   }
-  /* clean up */
+  /* cleanup after here */
+end:
+  if (errcode < 0)
+  {
+    fprintf(stderr, "the error was on line %d\n", pos+1);
+  }
   free(line);
   return errcode;
 }
