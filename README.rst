@@ -55,3 +55,16 @@ The first argument of this script is the binary file
 of int32 ACGTN counts per position.
 The second argument is a file containing only reference nucleotides.
 The final argument is the output filename for the int32 RABC counts.
+
+summarize-acgtn
+---------------
+
+Summarize a binary file of rows of counts,
+especially when the number of rows is large
+and the number of columns is small.
+
+The original purpose of this script is to summarize
+counts of (A, C, G, T, N) nucleotide symbols over
+aligned reads with respect to a reference sequence.
+Counts should be int32,
+but the summary uses int64 so overflow is unlikely.
