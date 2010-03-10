@@ -7,6 +7,7 @@
 #include "xgutil.h"
 
 #define ACGTN 5
+#define COLUMNS 10
 
 typedef int32_t ntcount_t;
 
@@ -47,7 +48,7 @@ int parse_tab_separation(char *s, char *s_words[])
   {
     if (*p == '\t')
     {
-      if (word_index > 10-1)
+      if (word_index >= COLUMNS)
       {
         fprintf(stderr, "expected only 9 tabs per line\n");
         return -1;
@@ -58,7 +59,7 @@ int parse_tab_separation(char *s, char *s_words[])
   }
   if (word_index != 10)
   {
-    fprintf(stderr, "expected 10 columns per line but found %d\n", word_index);
+    fprintf(stderr, "expected 9 tabs per line but found %d\n", word_index-1);
     return -1;
   }
   return 0;
@@ -166,7 +167,6 @@ int process(size_t ref_seq_length, FILE *fin, FILE *fout)
     if (parse_tab_separation(line, s_words) < 0)
     {
       fprintf(stderr, "this error was on line %d\n", pos+1);
-      fprintf(stderr, "second word: %s\n", s_words[1]);
       errcode = -1; break;
     }
     /* read the reference sequence position */

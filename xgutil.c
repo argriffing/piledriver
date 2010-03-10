@@ -32,9 +32,11 @@ char *fautogets(char *buffer, size_t *pbufsize, FILE *fin)
     nempty -= npartial;
     if (nempty == 1)
     {
-      /* If we have filled up the buffer as much as fgets allows,
-       * then reallocate it and update p.
+      /* We have filled up the buffer as much as fgets allows,
+       * so if the last character is a newline then we are done.
        */
+      if (buffer[nfilled-1] == '\n') break;
+      /* Otherwise we need to keep looking. */
       int next_bufsize = (nfilled + nempty)*2;
       buffer = realloc(buffer, next_bufsize);
       nempty = next_bufsize - nfilled;
