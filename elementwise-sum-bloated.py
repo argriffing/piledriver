@@ -1,10 +1,12 @@
+
+import argparse
 import numpy as np
 
 def main(args):
     # everything has type int32
     dt = np.dtype(np.int32)
     # read the first input file into an accumulation matrix
-    accum = open(args.input_files[0], 'rb')
+    accum = np.fromfile(args.input_files[0], dt)
     # accumulate the remaining input files
     for input_filename in args.input_files[1:]:
         addend = np.fromfile(input_filename, dt)
