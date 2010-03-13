@@ -3,9 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 
-/*
- * Don't complain if the pointer is NULL.
- */
 int fsafeclose(FILE *f)
 {
   if (f)
@@ -15,13 +12,32 @@ int fsafeclose(FILE *f)
   return 0;
 }
 
-/*
- * Automatically extend the buffer to fit the line of text.
- * Return the possibly reallocated buffer,
- * possibly modifying the bufsize argument to give the new buffer size.
- */
-char *fautogets(char *buffer, size_t *pbufsize, FILE *fin)
+int parse_tab_separation(char *s, char *s_words[], int maxwords)
 {
+  /* if the buffer is empty then there are no words */
+  if (!*s) return 0;
+  /* otherwise there are some words */
+  int word_index = 0;
+  s_words[word_index++] = s;
+  char *p;
+  for (p=s; *p; p++)
+  {
+    if (*p == '\t')
+    {
+      /* terminate the previous word */
+      *p = 0;
+      /* if the prev word was the final requested word then we've finished */
+      if (word_index == maxwords) break;
+      /* otherwise move towards the next tab or buffer termination */
+      s_words[word_index++] = p+1;
+    }
+  }
+  return word_index;
+}
+
+char *fautogets(char **pbuffer, size_t *pbufsize, FILE *fin)
+{
+  char *buffer = *pbuffer; /* the buffer to be filled */
   int nempty = *pbufsize; /* number of unfilled bytes in the buffer */
   int nfilled = 0; /* number of filled bytes in the buffer */
   char *p = buffer; /* begin filling here */
@@ -48,10 +64,12 @@ char *fautogets(char *buffer, size_t *pbufsize, FILE *fin)
   }
   /* set the new buffer size */
   *pbufsize = nfilled + nempty;
+  /* set the new buffer */
+  *pbuffer = buffer;
   /* return a value depending on whether we found anything */
   if (nfilled)
   {
-    return buffer;
+    return *pbuffer;
   } else {
     return NULL;
   }

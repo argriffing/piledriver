@@ -18,15 +18,13 @@ int process(FILE *fin, const char *prefix, const char *suffix)
   char *prev_filename = malloc(MAXFILENAME);
   size_t linesize = 8;
   char *line = malloc(linesize);
-  char *nextline;
   curr_filename[0] = 0;
   prev_filename[0] = 0;
   int prefix_length = strlen(prefix);
   int suffix_length = strlen(suffix);
   FILE *fappend = NULL;
-  while ((nextline = fautogets(line, &linesize, fin)) != NULL)
+  while (fautogets(&line, &linesize, fin) != NULL)
   {
-    line = nextline;
     size_t line_length = strlen(line);
     /* get the length of the first word */
     int i;
