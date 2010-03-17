@@ -1,5 +1,5 @@
 .PHONY: all
-all : piledriver pilesplitter elementwise-sum acgtn-to-rabc summarize-acgtn summarize-pileup
+all : piledriver pilesplitter elementwise-sum acgtn-to-rabc summarize-acgtn summarize-pileup extract-pileup-chromosome
 
 piledriver : piledriver.o xgutil.o pileutil.o
 	gcc piledriver.o xgutil.o pileutil.o -o piledriver
@@ -10,6 +10,11 @@ pilesplitter : pilesplitter.o xgutil.o
 	gcc pilesplitter.o xgutil.o -o pilesplitter
 pilesplitter.o : pilesplitter.c
 	gcc -c pilesplitter.c
+
+extract-pileup-chromosome : extract-pileup-chromosome.o xgutil.o
+	gcc extract-pileup-chromosome.o xgutil.o -o extract-pileup-chromosome
+extract-pileup-chromosome.o : extract-pileup-chromosome.c
+	gcc -c extract-pileup-chromosome.c
 
 elementwise-sum : elementwise-sum.o
 	gcc elementwise-sum.o -o elementwise-sum
@@ -32,14 +37,15 @@ summarize-pileup : summarize-pileup.o xgutil.o summaryutil.o pileutil.o
 summarize-pileup.o : summarize-pileup.c
 	gcc -c summarize-pileup.c
 
+
 pileutil.o : pileutil.c
-	gcc -c pileutil.c
+	gcc -c pileutil.c pileutil.h
 
 xgutil.o : xgutil.c
-	gcc -c xgutil.c
+	gcc -c xgutil.c xgutil.h
 
 summaryutil.o : summaryutil.c
-	gcc -c summaryutil.c
+	gcc -c summaryutil.c summaryutil.h
 
 
 clean :

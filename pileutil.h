@@ -2,6 +2,7 @@
 #define PILEUTIL_H
 
 #include <stdio.h>
+#include <stdint.h>
 
 
 #define ACGTN 5
