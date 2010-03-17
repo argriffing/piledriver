@@ -9,7 +9,10 @@ typedef int32_t ntcount_t;
 
 void fsafeclose(FILE *f)
 {
-  if (f) fclose(f);
+  if (f != NULL && f != stdin && f != stdout)
+  {
+    fclose(f);
+  }
 }
 
 int nt_to_index(char nt)
@@ -158,12 +161,17 @@ int main(int argc, char *argv[])
   FILE *fin_acgtn = NULL;
   FILE *fin_ref = NULL;
   FILE *fout = NULL;
-  /* open the binary input file */
-  fin_acgtn = fopen(argv[1], "rb");
-  if (!fin_acgtn)
+  /* define the binary input stream for reading */
+  if (!strcmp(argv[1], "-"))
   {
-    fprintf(stderr, "Failed to open %s for reading.\n", argv[1]);
-    errcode = EXIT_FAILURE; goto end;
+    fin_acgtn = stdin;
+  } else {
+    fin_acgtn = fopen(argv[1], "rb");
+    if (!fin_acgtn)
+    {
+      fprintf(stderr, "Failed to open %s for reading.\n", argv[1]);
+      errcode = EXIT_FAILURE; goto end;
+    }
   }
   /* open the reference sequence input file */
   fin_ref = fopen(argv[2], "rb");
@@ -172,12 +180,17 @@ int main(int argc, char *argv[])
     fprintf(stderr, "Failed to open %s for reading.\n", argv[2]);
     errcode = EXIT_FAILURE; goto end;
   }
-  /* open the output file for writing binary data */
-  fout = fopen(argv[3], "wb");
-  if (!fout)
+  /* define the binary output stream for writing */
+  if (!strcmp(argv[3], "-"))
   {
-    fprintf(stderr, "Failed to open %s for writing.\n", argv[3]);
-    errcode = EXIT_FAILURE; goto end;
+    fout = stdout;
+  } else {
+    fout = fopen(argv[3], "wb");
+    if (!fout)
+    {
+      fprintf(stderr, "Failed to open %s for writing.\n", argv[3]);
+      errcode = EXIT_FAILURE; goto end;
+    }
   }
   /* do the conversion */
   if (process(fin_acgtn, fin_ref, fout) < 0)
@@ -186,8 +199,8 @@ int main(int argc, char *argv[])
   }
 end:
   fsafeclose(fin_acgtn);
-  fsafeclose(fin_ref);
   fsafeclose(fout);
+  fsafeclose(fin_ref);
   return errcode;
 }
 
