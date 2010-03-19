@@ -95,10 +95,12 @@ int parse_acgtn(char ref_nt, const char *pile, ntcount_t *acgtn_counts)
   return 0;
 }
 
-int parse_pileup_line(char *line,
-    int *pref_star, int *pref_pos, ntcount_t *acgtn_counts)
+int parse_pileup_line(char *line, struct ref_t *pref,
+    ntcount_t *acgtn_counts)
 {
-  *pref_star = 0;
+  pref->is_star = 0;
+  pref->is_N = 0;
+  pref->pos = -1;
   /* array of word start pointers in the input line */
   char *s_words[COLUMNS+1];
   /* parse the tab separated words */
@@ -110,10 +112,13 @@ int parse_pileup_line(char *line,
     fprintf(stderr, "but found %d\n", nwords-1);
     return -1;
   }
+  /* get the length of the reference nucleotide column */
+  int ref_word_length = strlen(s_words[2]);
   /* read the reference nucleotide */
-  char ref_nt = s_words[2][0];
+
+  const char *ref_word = s_words[2];
   /* ignore this pileup line if the reference base is an asterisk */
-  if (ref_nt == '*')
+  if (!strcmp(ref_word, "*"))
   {
     /*
      * At this position there is an insertion into aligned reads
@@ -123,7 +128,7 @@ int parse_pileup_line(char *line,
      * Second, these rows sometimes have more than
      * the nominal number of columns.
      */
-    *pref_star = 1;
+    pref->is_star = 1;
     return 0;
   }
   /* complain if too many words were found */
@@ -133,7 +138,7 @@ int parse_pileup_line(char *line,
     return -1;
   }
   /* read the base-one reference sequence position */
-  *pref_pos = atoi(s_words[1]);
+  pref->pos = atoi(s_words[1]);
   /* get the ACGTN counts */
   int i;
   for (i=0; i<ACGTN; i++) acgtn_counts[i] = 0;
