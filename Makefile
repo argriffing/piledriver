@@ -49,4 +49,4 @@ summaryutil.o : summaryutil.c
 
 
 clean :
-	rm *.o
+	rm *.o *.gch
