@@ -51,4 +51,4 @@ summaryutil.o : summaryutil.c summaryutil.h
 
 
 clean :
-	rm *.o *.gch
+	rm *.o
