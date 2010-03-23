@@ -275,7 +275,6 @@ int process_pileup(FILE *fin, FILE *fseq, FILE *fout)
   char *line = malloc(linesize);
   int last_index = -1;
   int current_index;
-  t_ntcount acgtn_counts[5];
   int pileup_line_index; /* required for detailed error reporting */
   for (pileup_line_index=0; ; ++pileup_line_index)
   {
@@ -353,6 +352,13 @@ int process_pileup(FILE *fin, FILE *fseq, FILE *fout)
         fprintf(stderr, "nucleotides do not match\n");
         errcode = -1; goto end;
       }
+      /* get the acgtn counts at the position */
+      t_ntcount acgtn_counts[5] = {0, 0, 0, 0, 0};
+      if (parse_pile(cols[8], acgtn_ref.index, acgtn_counts) < 0)
+      {
+        errcode = -1; goto end;
+      }
+      /* write the counts */
       write_informative_data(acgtn_counts, fout);
     }
   }
