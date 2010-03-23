@@ -33,7 +33,7 @@ int parse_acgtn(char ref_nt, const char *pile, ntcount_t *acgtn_counts);
  * @param acgtn_counts: will hold the five acgtn counts
  * @return: 0 if success, -1 if error
  */
-int parse_pileup_line(char *line, struct ref_t *pref,
+int parse_pileup_line(char *line, int *ref_star, int *ref_pos,
     ntcount_t *acgtn_counts);
 
 #endif

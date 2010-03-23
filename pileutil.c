@@ -61,8 +61,12 @@ int nt_to_acgtn_index_silent(char nt)
 
 int parse_acgtn(char ref_nt, const char *pile, ntcount_t *acgtn_counts)
 {
-  int ref_index = nt_to_index(ref_nt);
-  if (ref_index < 0) return -1;
+  int ref_index = nt_to_acgtn_index_silent(ref_nt);
+  if (ref_index < 0)
+  {
+    fprintf(stderr, "invalid reference nucleotide: %c\n", ref_nt);
+    return -1;
+  }
   int nt_index;
   int indel_length;
   const char *p = pile;
@@ -90,8 +94,12 @@ int parse_acgtn(char ref_nt, const char *pile, ntcount_t *acgtn_counts)
       p++;
     } else {
       /* this should be a non-reference nucleotide */
-      nt_index = nt_to_index(*p);
-      if (nt_index < 0) return -1;
+      nt_index = nt_to_acgtn_index_silent(*p);
+      if (nt_index < 0)
+      {
+        fprintf(stderr, "invalid non-reference nucleotide: %c\n", *p);
+        return -1;
+      }
       acgtn_counts[nt_index]++;
       p++;
     }
@@ -99,8 +107,11 @@ int parse_acgtn(char ref_nt, const char *pile, ntcount_t *acgtn_counts)
   return 0;
 }
 
-int parse_pileup_line(char *line, struct ref_t *pref, ntcount_t *acgtn_counts)
+int parse_pileup_line(char *line, int *ref_star, int *ref_pos,
+    ntcount_t *acgtn_counts)
 {
+  struct ref_t ref;
+  struct ref_t *pref = &ref;
   pref->is_star = 0;
   pref->is_N = 0;
   pref->pos = -1;
@@ -116,12 +127,17 @@ int parse_pileup_line(char *line, struct ref_t *pref, ntcount_t *acgtn_counts)
     return -1;
   }
   /* get the length of the reference nucleotide column */
-  int ref_word_length = strlen(s_words[2]);
-  /* read the reference nucleotide */
-
   const char *ref_word = s_words[2];
+  int ref_word_length = strlen(ref_word);
+  if (ref_word_length != 1)
+  {
+    fprintf(stderr, "invalid reference nucleotide string: %s\n", ref_word);
+    return -1;
+  }
+  /* get the reference nucleotide */
+  char ref_nt = ref_word[0];
   /* ignore this pileup line if the reference base is an asterisk */
-  if (!strcmp(ref_word, "*"))
+  if (ref_nt == '*')
   {
     /*
      * At this position there is an insertion into aligned reads
@@ -132,6 +148,7 @@ int parse_pileup_line(char *line, struct ref_t *pref, ntcount_t *acgtn_counts)
      * the nominal number of columns.
      */
     pref->is_star = 1;
+    *ref_star = pref->is_star;
     return 0;
   }
   /* complain if too many words were found */
@@ -150,5 +167,7 @@ int parse_pileup_line(char *line, struct ref_t *pref, ntcount_t *acgtn_counts)
     return -1;
   }
   /* success */
+  *ref_star = pref->is_star;
+  *ref_pos = pref->pos;
   return 0;
 }
