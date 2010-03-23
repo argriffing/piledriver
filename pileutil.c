@@ -35,22 +35,26 @@ Column Definition
 10 Quality values
 */
 
-int nt_to_index(char nt)
+int nt_to_acgtn_index_silent(char nt)
 {
   switch (nt)
   {
     case 'a':
-    case 'A': return 0;
+    case 'A':
+      return 0;
     case 'c':
-    case 'C': return 1;
+    case 'C':
+      return 1;
     case 'g':
-    case 'G': return 2;
+    case 'G':
+      return 2;
     case 't':
-    case 'T': return 3;
+    case 'T':
+      return 3;
     case 'n':
-    case 'N': return 4;
+    case 'N':
+      return 4;
     default:
-      fprintf(stderr, "bad nucleotide: %c\n", nt);
       return -1;
   }
 }
@@ -95,8 +99,7 @@ int parse_acgtn(char ref_nt, const char *pile, ntcount_t *acgtn_counts)
   return 0;
 }
 
-int parse_pileup_line(char *line, struct ref_t *pref,
-    ntcount_t *acgtn_counts)
+int parse_pileup_line(char *line, struct ref_t *pref, ntcount_t *acgtn_counts)
 {
   pref->is_star = 0;
   pref->is_N = 0;

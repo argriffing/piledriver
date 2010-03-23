@@ -12,7 +12,7 @@ int fsafeclose(FILE *f)
   return 0;
 }
 
-int parse_tab_separation(char *s, char *s_words[], int maxwords)
+int parse_tab_separation(char *s, char **s_words, int maxwords)
 {
   /* if the buffer is empty then there are no words */
   if (!*s) return 0;
