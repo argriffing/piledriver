@@ -1,5 +1,7 @@
+FLAGS = -W -Wall -pipe -march=native
+
 .PHONY: all
-all : piledriver pilesplitter elementwise-sum acgtn-to-rabc summarize-acgtn summarize-pileup extract-pileup-chromosome pileup-to-acgtn
+all : piledriver pilesplitter acgtn-to-rabc summarize-acgtn summarize-pileup extract-pileup-chromosome pileup-to-acgtn
 
 piledriver : piledriver.o xgutil.o pileutil.o
 	gcc piledriver.o xgutil.o pileutil.o -o piledriver
@@ -20,11 +22,6 @@ extract-pileup-chromosome : extract-pileup-chromosome.o xgutil.o
 	gcc extract-pileup-chromosome.o xgutil.o -o extract-pileup-chromosome
 extract-pileup-chromosome.o : extract-pileup-chromosome.c
 	gcc -c extract-pileup-chromosome.c
-
-elementwise-sum : elementwise-sum.o
-	gcc elementwise-sum.o -o elementwise-sum
-elementwise-sum.o : elementwise-sum.c
-	gcc -c elementwise-sum.c
 
 acgtn-to-rabc : acgtn-to-rabc.o
 	gcc acgtn-to-rabc.o -o acgtn-to-rabc
