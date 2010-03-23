@@ -368,7 +368,7 @@ int process_pileup(FILE *fin, FILE *fseq, FILE *fout)
 end:
   if (errcode < 0)
   {
-    fprintf(stderr, "the error was on line %d\n", pos+1);
+    fprintf(stderr, "the error was on pileup line %d\n", pileup_line_index+1);
   }
   free(line);
   return errcode;
