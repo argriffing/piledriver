@@ -29,6 +29,17 @@ that it should actually compile and its
 single parameter is a reference sequence filename
 instead of a reference sequence length.
 
+extract-pileup-chromosome
+-------------------------
+
+Extract one chromosome from a pileup file.
+
+The input is through stdin,
+and the single command line argument is the name of the chromosome.
+The output is to stdout
+and consists of lines of the pileup file
+relevant to the specified chromosome.
+
 pilesplitter
 ------------
 
@@ -68,3 +79,10 @@ counts of (A, C, G, T, N) nucleotide symbols over
 aligned reads with respect to a reference sequence.
 Counts should be int32,
 but the summary uses int64 so overflow is unlikely.
+
+summarize-pileup
+----------------
+
+Summarize ACGTN aligned read counts in a pileup file.
+Input is a pileup file on stdin and
+output is human readable info on stdout.
