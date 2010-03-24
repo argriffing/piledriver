@@ -5,8 +5,6 @@
 
 #include "xgutil.h"
 
-#define MAXFILENAME 8192
-
 int starts_with_word(const char *line, const char *word)
 {
   int i = 0;
@@ -44,7 +42,6 @@ int starts_with_word(const char *line, const char *word)
  */
 int process(FILE *fin, FILE *fout, const char *requested_chromosome)
 {
-  size_t requested_length = strlen(requested_chromosome);
   size_t linesize = 8;
   char *line = malloc(linesize);
   while (fautogets(&line, &linesize, fin) != NULL)

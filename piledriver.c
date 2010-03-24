@@ -26,7 +26,7 @@ int write_informative_data(const ntcount_t *acgtn_counts, FILE *fout)
   return errcode;
 }
 
-int process_pileup(size_t ref_seq_length, FILE *fin, FILE *fout)
+int process_pileup(int ref_seq_length, FILE *fin, FILE *fout)
 {
   int pos;
   int errcode = 0;
@@ -37,7 +37,6 @@ int process_pileup(size_t ref_seq_length, FILE *fin, FILE *fout)
   int current_index;
   int ref_star;
   int ref_pos;
-  char ref_nt;
   ntcount_t acgtn_counts[ACGTN];
   for (pos=0;
       fautogets(&line, &linesize, fin) != NULL;
@@ -62,7 +61,7 @@ int process_pileup(size_t ref_seq_length, FILE *fin, FILE *fout)
     /* if the position is out of bounds then ignore the counts */
     if (current_index >= ref_seq_length)
     {
-      if (ref_nt != 'N')
+      if (ref_pos != 4)
       {
         fprintf(stderr, "out of bounds positions should have ref nt N\n");
         errcode = -1; goto end;
@@ -101,7 +100,7 @@ int main(int argc, char *argv[])
     fprintf(stderr, "which should be the length of the reference sequence\n");
     return EXIT_FAILURE;
   }
-  size_t ref_seq_length = atoi(argv[1]);
+  int ref_seq_length = atoi(argv[1]);
   if (process_pileup(ref_seq_length, stdin, stdout) < 0)
   {
     return EXIT_FAILURE;

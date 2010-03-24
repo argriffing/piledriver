@@ -269,7 +269,6 @@ int write_terminal_filler(FILE *fseq, FILE *fout)
 
 int process_pileup(FILE *fin, FILE *fseq, FILE *fout)
 {
-  int pos;
   int errcode = 0;
   size_t linesize = 8;
   char *line = malloc(linesize);

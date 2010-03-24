@@ -8,9 +8,6 @@
 #include "pileutil.h"
 #include "summaryutil.h"
 
-
-
-
 /*
  * Read the pileup and write the summary.
  */
@@ -25,7 +22,6 @@ int summarize(FILE *fin, FILE *fout)
   int ref_pos;
   ntcount_t acgtn_counts[ACGTN];
   int pos;
-  int i;
   size_t linesize = 8;
   char *line = malloc(linesize);
   for (pos=0;
@@ -42,7 +38,6 @@ int summarize(FILE *fin, FILE *fout)
       add_to_summary(&summary, acgtn_counts);
     }
   }
-end:
   /* cleanup */
   if (errcode < 0)
   {
@@ -55,7 +50,7 @@ end:
   return errcode;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char **argv)
 {
   if (argc != 1)
   {
