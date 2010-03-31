@@ -1,4 +1,4 @@
-FLAGS = -Wall -Wextra -std=c99 -pedantic -pipe -march=native
+FLAGS = -Wall -Wextra -std=c99 -pedantic -pipe
 
 .PHONY: all
 all : piledriver pilesplitter acgtn-to-rabc summarize-acgtn summarize-pileup extract-pileup-chromosome pileup-to-acgtn
