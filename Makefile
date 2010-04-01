@@ -1,53 +1,66 @@
-FLAGS = -Wall -Wextra -std=c99 -pedantic -pipe -march=native
+CFLAGS = -Wall -Wextra -std=c99 -pedantic -pipe
+CPPFLAGS = -Wall -Wextra -pedantic -pipe
+
+MYCC = gcc
+MYCPP = g++
 
 .PHONY: all
-all : piledriver pilesplitter acgtn-to-rabc summarize-acgtn summarize-pileup extract-pileup-chromosome pileup-to-acgtn
+all : piledriver pilesplitter acgtn-to-rabc summarize-acgtn \
+	summarize-pileup extract-pileup-chromosome pileup-to-acgtn \
+	get-pileup-chromosome-names
 
 piledriver : piledriver.o xgutil.o pileutil.o
-	gcc piledriver.o xgutil.o pileutil.o -o piledriver
+	${MYCC} piledriver.o xgutil.o pileutil.o -o piledriver
 piledriver.o : piledriver.c
-	gcc ${FLAGS} -c piledriver.c
+	${MYCC} ${CFLAGS} -c piledriver.c
 
 pileup-to-acgtn : pileup-to-acgtn.o xgutil.o
-	gcc pileup-to-acgtn.o xgutil.o -o pileup-to-acgtn
+	${MYCC} pileup-to-acgtn.o xgutil.o -o pileup-to-acgtn
 pileup-to-acgtn.o : pileup-to-acgtn.c
-	gcc ${FLAGS} -c pileup-to-acgtn.c
+	${MYCC} ${CFLAGS} -c pileup-to-acgtn.c
 
 pilesplitter : pilesplitter.o xgutil.o
-	gcc pilesplitter.o xgutil.o -o pilesplitter
+	${MYCC} pilesplitter.o xgutil.o -o pilesplitter
 pilesplitter.o : pilesplitter.c
-	gcc ${FLAGS} -c pilesplitter.c
+	${MYCC} ${CFLAGS} -c pilesplitter.c
 
 extract-pileup-chromosome : extract-pileup-chromosome.o xgutil.o
-	gcc extract-pileup-chromosome.o xgutil.o -o extract-pileup-chromosome
+	${MYCC} extract-pileup-chromosome.o xgutil.o \
+		-o extract-pileup-chromosome
 extract-pileup-chromosome.o : extract-pileup-chromosome.c
-	gcc ${FLAGS} -c extract-pileup-chromosome.c
+	${MYCC} ${CFLAGS} -c extract-pileup-chromosome.c
 
 acgtn-to-rabc : acgtn-to-rabc.o
-	gcc acgtn-to-rabc.o -o acgtn-to-rabc
+	${MYCC} acgtn-to-rabc.o -o acgtn-to-rabc
 acgtn-to-rabc.o : acgtn-to-rabc.c
-	gcc ${FLAGS} -c acgtn-to-rabc.c
+	${MYCC} ${CFLAGS} -c acgtn-to-rabc.c
 
 summarize-acgtn : summarize-acgtn.o xgutil.o
-	gcc summarize-acgtn.o xgutil.o -o summarize-acgtn
+	${MYCC} summarize-acgtn.o xgutil.o -o summarize-acgtn
 summarize-acgtn.o : summarize-acgtn.c
-	gcc ${FLAGS} -c summarize-acgtn.c
+	${MYCC} ${CFLAGS} -c summarize-acgtn.c
 
 summarize-pileup : summarize-pileup.o xgutil.o summaryutil.o pileutil.o
-	gcc summarize-pileup.o xgutil.o summaryutil.o pileutil.o -o summarize-pileup
-
+	${MYCC} summarize-pileup.o xgutil.o summaryutil.o pileutil.o \
+		-o summarize-pileup
 summarize-pileup.o : summarize-pileup.c
-	gcc ${FLAGS} -c summarize-pileup.c
+	${MYCC} ${CFLAGS} -c summarize-pileup.c
+
+get-pileup-chromosome-names : get-pileup-chromosome-names.o xgutil.o
+	${MYCPP} get-pileup-chromosome-names.o xgutil.o \
+		-o get-pileup-chromosome-names
+get-pileup-chromosome-names.o : get-pileup-chromosome-names.C
+	${MYCPP} ${CPPFLAGS} -c get-pileup-chromosome-names.C
 
 
 pileutil.o : pileutil.c pileutil.h
-	gcc ${FLAGS} -c pileutil.c
+	${MYCC} ${CFLAGS} -c pileutil.c
 
 xgutil.o : xgutil.c xgutil.h
-	gcc ${FLAGS} -c xgutil.c
+	${MYCC} ${CFLAGS} -c xgutil.c
 
 summaryutil.o : summaryutil.c summaryutil.h
-	gcc ${FLAGS} -c summaryutil.c
+	${MYCC} ${CFLAGS} -c summaryutil.c
 
 
 clean :
